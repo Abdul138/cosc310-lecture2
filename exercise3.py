@@ -25,11 +25,15 @@ class Cart:
         # TODO: validate FIRST, then mutate.
         #   if qty < 1:                 raise ValueError(...)
         if qty < 1:
-            raise ValueError(f"qty must be at least 1, got {qty}")
+            raise ValueError("qty must be at least 1")
         #   if not item["available"]:   raise OutOfStockError(...)
         if not item["available"]:
             raise OutOfStockError(f"{item['name']} is currently out of stock")
 
+        for line in self.lines:
+            if line["item_id"] == item["id"]:
+                line["qty"] += qty
+                return
         self.lines.append({
             "item_id": item["id"],
             "name": item["name"],
@@ -53,6 +57,9 @@ class Cart:
 
     def total(self) -> float:
         return round(sum(line["price"] * line["qty"] for line in self.lines), 2)
+    
+    def clear(self):
+        self.lines = []
 
     def __repr__(self) -> str:
         return f"<Cart {len(self.lines)} items, ${self.total():.2f}>"
